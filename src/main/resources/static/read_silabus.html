@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Silabus Mata Pelajaran</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        th, td {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manajemen Silabus Mata Pelajaran</h1>
+
+    <h2>Tambah Silabus Baru</h2>
+
+    <form id="formTambahSilabus">
+        <label for="mataPelajaran">Mata Pelajaran:</label><br>
+        <select id="mataPelajaran" name="mataPelajaran" required>
+            <!-- Options will be filled dynamically from API -->
+        </select><br><br>
+
+        <label for="judul">Judul:</label><br>
+        <input type="text" id="judul" name="judul" required><br><br>
+
+        <label for="deskripsi">Deskripsi:</label><br>
+        <textarea id="deskripsi" name="deskripsi" rows="4" required></textarea><br><br>
+
+        <label for="tujuan">Tujuan:</label><br>
+        <textarea id="tujuan" name="tujuan" rows="4" required></textarea><br><br>
+
+        <label for="materi">Materi:</label><br>
+        <textarea id="materi" name="materi" rows="4" required></textarea><br><br>
+
+        <label for="metode">Metode:</label><br>
+        <textarea id="metode" name="metode" rows="4" required></textarea><br><br>
+
+        <label for="evaluasi">Evaluasi:</label><br>
+        <textarea id="evaluasi" name="evaluasi" rows="4" required></textarea><br><br>
+
+        <button type="submit">Simpan</button>
+    </form>
+
+    <h2>Daftar Silabus</h2>
+
+    <table id="tabelSilabus">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Mata Pelajaran</th>
+                <th>Judul</th>
+                <th>Deskripsi</th>
+                <th>Tujuan</th>
+                <th>Materi</th>
+                <th>Metode</th>
+                <th>Evaluasi</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be populated dynamically from API -->
+        </tbody>
+    </table>
+
+    <h2>Edit Silabus</h2>
+
+    <form id="formEditSilabus" style="display: none;">
+        <input type="hidden" id="idSilabus" name="idSilabus">
+
+        <label for="editMataPelajaran">Mata Pelajaran:</label><br>
+        <select id="editMataPelajaran" name="mataPelajaran" required>
+            <!-- Options will be filled dynamically from API -->
+        </select><br><br>
+
+        <label for="editJudul">Judul:</label><br>
+        <input type="text" id="editJudul" name="judul" required><br><br>
+
+        <label for="editDeskripsi">Deskripsi:</label><br>
+        <textarea id="editDeskripsi" name="deskripsi" rows="4" required></textarea><br><br>
+
+        <label for="editTujuan">Tujuan:</label><br>
+        <textarea id="editTujuan" name="tujuan" rows="4" required></textarea><br><br>
+
+        <label for="editMateri">Materi:</label><br>
+        <textarea id="editMateri" name="materi" rows="4" required></textarea><br><br>
+
+        <label for="editMetode">Metode:</label><br>
+        <textarea id="editMetode" name="metode" rows="4" required></textarea><br><br>
+
+        <label for="editEvaluasi">Evaluasi:</label><br>
+        <textarea id="editEvaluasi" name="evaluasi" rows="4" required></textarea><br><br>
+
+        <button type="submit">Simpan Perubahan</button>
+        <button type="button" onclick="cancelEdit()">Batal</button>
+    </form>
+
+    <script>
+        async function fetchMataPelajaran() {
+            const response = await fetch('http://localhost:8080/api/mata-pelajaran');
+            const data = await response.json();
+            return data;
+        }
+
+        async function renderMataPelajaranOptions() {
+            const mataPelajaranList = await fetchMataPelajaran();
+            const select = document.querySelectorAll('select');
+
+            select.forEach(selectElement => {
+                selectElement.innerHTML = '';
+                mataPelajaranList.forEach(mataPelajaran => {
+                    const option = document.createElement('option');
+                    option.value = mataPelajaran.id;
+                    option.textContent = `${mataPelajaran.kodeMapel} - ${mataPelajaran.namaMapel}`;
+                    selectElement.appendChild(option);
+                });
+            });
+        }
+
+        async function fetchSilabus() {
+            const response = await fetch('http://localhost:8080/api/silabus/findAll');
+            const data = await response.json();
+            return data;
+        }
+
+        async function renderSilabus() {
+            const silabusList = await fetchSilabus();
+            const tbody = document.querySelector('#tabelSilabus tbody');
+
+            tbody.innerHTML = '';
+
+            silabusList.forEach(silabus => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${silabus.id}</td>
+                    <td>${silabus.mataPelajaran.namaMapel}</td>
+                    <td>${silabus.judul}</td>
+                    <td>${silabus.deskripsi}</td>
+                    <td>${silabus.tujuan}</td>
+                    <td>${silabus.materi}</td>
+                    <td>${silabus.metode}</td>
+                    <td>${silabus.evaluasi}</td>
+                    <td>
+                        <button onclick="fillFormEdit(${silabus.id})">Edit</button>
+                        <button onclick="confirmDelete(${silabus.id})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function fillFormEdit(id) {
+            const response = await fetch(`http://localhost:8080/api/silabus/find/${id}`);
+            const silabus = await response.json();
+
+            document.getElementById('idSilabus').value = silabus.id;
+            document.getElementById('editMataPelajaran').value = silabus.mataPelajaran.id;
+            document.getElementById('editJudul').value = silabus.judul;
+            document.getElementById('editDeskripsi').value = silabus.deskripsi;
+            document.getElementById('editTujuan').value = silabus.tujuan;
+            document.getElementById('editMateri').value = silabus.materi;
+            document.getElementById('editMetode').value = silabus.metode;
+            document.getElementById('editEvaluasi').value = silabus.evaluasi;
+
+            document.getElementById('formEditSilabus').style.display = 'block';
+            document.getElementById('tabelSilabus').style.display = 'none';
+        }
+
+        async function cancelEdit() {
+            document.getElementById('formEditSilabus').reset();
+            document.getElementById('formEditSilabus').style.display = 'none';
+            document.getElementById('tabelSilabus').style.display = 'block';
+        }
+
+        async function editSilabus(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('idSilabus').value;
+            const mataPelajaran = document.getElementById('editMataPelajaran').value;
+            const judul = document.getElementById('editJudul').value;
+            const deskripsi = document.getElementById('editDeskripsi').value;
+            const tujuan = document.getElementById('editTujuan').value;
+            const materi = document.getElementById('editMateri').value;
+            const metode = document.getElementById('editMetode').value;
+            const evaluasi = document.getElementById('editEvaluasi').value;
+
+            const data = {
+                id: parseInt(id),
+                mataPelajaran: {
+                    id: parseInt(mataPelajaran)
+                },
+                judul: judul,
+                deskripsi: deskripsi,
+                tujuan: tujuan,
+                materi: materi,
+                metode: metode,
+                evaluasi: evaluasi
+            };
+
+            const response = await fetch(`http://localhost:8080/api/silabus/update/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert('Data silabus berhasil diperbarui!');
+                document.getElementById('formEditSilabus').reset();
+                document.getElementById('formEditSilabus').style.display = 'none';
+                document.getElementById('tabelSilabus').style.display = 'block';
+
+                renderSilabus();
+            } else {
+                alert('Gagal memperbarui data silabus.');
+            }
+        }
+
+        async function confirmDelete(id) {
+            if (confirm('Anda yakin ingin menghapus data silabus ini?')) {
+                const response = await fetch(`http://localhost:8080/api/silabus/delete/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Data silabus berhasil dihapus!');
+                    renderSilabus();
+                } else {
+                    alert('Gagal menghapus data silabus.');
+                }
+            }
+        }
+
+        document.getElementById('formEditSilabus').addEventListener('submit', editSilabus);
+
+        document.getElementById('formTambahSilabus').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const mataPelajaran = document.getElementById('mataPelajaran').value;
+            const judul = document.getElementById('judul').value;
+            const deskripsi = document.getElementById('deskripsi').value;
+            const tujuan = document.getElementById('tujuan').value;
+            const materi = document.getElementById('materi').value;
+            const metode = document.getElementById('metode').value;
+            const evaluasi = document.getElementById('evaluasi').value;
+
+            const data = {
+                mataPelajaran: {
+                    id: parseInt(mataPelajaran)
+                },
+                judul: judul,
+                deskripsi: deskripsi,
+                tujuan: tujuan,
+                materi: materi,
+                metode: metode,
+                evaluasi: evaluasi
+            };
+
+            const response = await fetch('http://localhost:8080/api/silabus/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert('Data silabus berhasil disimpan!');
+                document.getElementById('formTambahSilabus').reset();
+                renderSilabus();
+            } else {
+                alert('Gagal menyimpan data silabus.');
+            }
+        });
+
+        renderMataPelajaranOptions();
+        renderSilabus();
+    </script>
+</body>
+</html>
