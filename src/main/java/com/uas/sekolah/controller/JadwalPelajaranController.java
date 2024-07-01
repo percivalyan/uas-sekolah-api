@@ -19,7 +19,7 @@ public class JadwalPelajaranController {
 
     @GetMapping("/jadwal-pelajaran")
     public ResponseEntity<List<JadwalPelajaran>> getAllJadwalPelajaran() {
-        List<JadwalPelajaran> jadwalPelajaranList = jadwalPelajaranService.getAllJadwalPelajaran();
+        List<JadwalPelajaran> jadwalPelajaranList = jadwalPelajaranService.lihatJadwalPelajaran();
         return new ResponseEntity<>(jadwalPelajaranList, HttpStatus.OK);
     }
 
@@ -31,20 +31,20 @@ public class JadwalPelajaranController {
 
     @PostMapping("/jadwal-pelajaran")
     public ResponseEntity<JadwalPelajaran> saveJadwalPelajaran(@RequestBody JadwalPelajaran jadwalPelajaran) {
-        JadwalPelajaran savedJadwalPelajaran = jadwalPelajaranService.saveJadwalPelajaran(jadwalPelajaran);
+        JadwalPelajaran savedJadwalPelajaran = jadwalPelajaranService.simpanJadwalPelajaran(jadwalPelajaran);
         return new ResponseEntity<>(savedJadwalPelajaran, HttpStatus.CREATED);
     }
 
     @PutMapping("/jadwal-pelajaran/{id}")
     public ResponseEntity<JadwalPelajaran> updateJadwalPelajaran(@PathVariable("id") int id, @RequestBody JadwalPelajaran jadwalPelajaran) {
         jadwalPelajaran.setId(id);
-        JadwalPelajaran updatedJadwalPelajaran = jadwalPelajaranService.updateJadwalPelajaran(jadwalPelajaran);
+        JadwalPelajaran updatedJadwalPelajaran = jadwalPelajaranService.ubahJadwalPelajaran(jadwalPelajaran);
         return new ResponseEntity<>(updatedJadwalPelajaran, HttpStatus.OK);
     }
 
     @DeleteMapping("/jadwal-pelajaran/{id}")
     public ResponseEntity<String> deleteJadwalPelajaran(@PathVariable("id") int id) {
-        String message = jadwalPelajaranService.deleteJadwalPelajaran(id);
+        String message = jadwalPelajaranService.hapusJadwalPelajaran(id);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }

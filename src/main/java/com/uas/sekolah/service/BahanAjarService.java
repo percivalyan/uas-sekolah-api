@@ -24,25 +24,22 @@ public class BahanAjarService {
     private MataPelajaranRepository mataPelajaranRepository;
 
     @Transactional
-    public ResponseEntity<String> createBahanAjar(BahanAjar bahanAjar) {
+    public ResponseEntity<String> simpanBahanAjar(BahanAjar bahanAjar) {
         try {
-            // Check if the associated MataPelajaran exists
             MataPelajaran mataPelajaran = mataPelajaranRepository.findById(bahanAjar.getMataPelajaran().getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Mata Pelajaran not found"));
 
-            // Set the MataPelajaran for BahanAjar
             bahanAjar.setMataPelajaran(mataPelajaran);
 
-            // Save BahanAjar
             bahanAjarRepository.save(bahanAjar);
 
-            return new ResponseEntity<>("Bahan Ajar created successfully", HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Bahan Ajar with ID " + bahanAjar.getId() + " created successfully");
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error creating Bahan Ajar", e);
         }
     }
 
-    public List<BahanAjar> getAllBahanAjar() {
+    public List<BahanAjar> lihatBahanAjar() {
         return bahanAjarRepository.findAll();
     }
 
@@ -52,7 +49,7 @@ public class BahanAjarService {
     }
 
     @Transactional
-    public ResponseEntity<String> updateBahanAjar(int id, BahanAjar updatedBahanAjar) {
+    public ResponseEntity<String> ubahBahanAjar(int id, BahanAjar updatedBahanAjar) {
         try {
             BahanAjar existingBahanAjar = bahanAjarRepository.findById(id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bahan Ajar not found"));
@@ -78,7 +75,7 @@ public class BahanAjarService {
     }
 
     @Transactional
-    public ResponseEntity<String> deleteBahanAjar(int id) {
+    public ResponseEntity<String> hapusBahanAjar(int id) {
         try {
             BahanAjar bahanAjar = bahanAjarRepository.findById(id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bahan Ajar not found"));

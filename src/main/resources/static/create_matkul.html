@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Mata Pelajaran Baru</title>
+</head>
+<body>
+    <h1>Tambah Mata Pelajaran Baru</h1>
+
+    <form id="formTambahMapel">
+        <label for="kodeMapel">Kode Mata Pelajaran:</label><br>
+        <input type="text" id="kodeMapel" name="kodeMapel" required><br><br>
+
+        <label for="namaMapel">Nama Mata Pelajaran:</label><br>
+        <input type="text" id="namaMapel" name="namaMapel" required><br><br>
+
+        <label for="tingkat">Tingkat:</label><br>
+        <input type="text" id="tingkat" name="tingkat" required><br><br>
+
+        <button type="submit">Simpan</button>
+    </form>
+
+    <script>
+        document.getElementById('formTambahMapel').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const kodeMapel = document.getElementById('kodeMapel').value;
+            const namaMapel = document.getElementById('namaMapel').value;
+            const tingkat = document.getElementById('tingkat').value;
+
+            const data = {
+                kodeMapel: kodeMapel,
+                namaMapel: namaMapel,
+                tingkat: tingkat
+            };
+
+            const response = await fetch('http://localhost:8080/api/mata-pelajaran', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert('Data mata pelajaran berhasil disimpan!');
+                // Clear form fields after successful submission (optional)
+                document.getElementById('formTambahMapel').reset();
+            } else {
+                alert('Gagal menyimpan data mata pelajaran.');
+            }
+        });
+    </script>
+</body>
+</html>

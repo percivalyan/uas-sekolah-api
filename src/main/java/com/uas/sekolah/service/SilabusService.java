@@ -23,7 +23,7 @@ public class SilabusService {
         this.mataPelajaranRepository = mataPelajaranRepository;
     }
 
-    public Silabus createSilabus(Silabus silabus) {
+    public Silabus simpanSilabus(Silabus silabus) {
         MataPelajaran mataPelajaran = silabus.getMataPelajaran();
         if (mataPelajaran != null && mataPelajaran.getId() != 0) {
             mataPelajaran = mataPelajaranRepository.findById(mataPelajaran.getId()).orElse(mataPelajaran);
@@ -32,7 +32,7 @@ public class SilabusService {
         return silabusRepository.save(silabus);
     }
 
-    public Silabus updateSilabus(int id, Silabus updatedSilabus) {
+    public Silabus ubahSilabus(int id, Silabus updatedSilabus) {
         Optional<Silabus> existingSilabus = silabusRepository.findById(id);
         if (existingSilabus.isPresent()) {
             Silabus silabus = existingSilabus.get();
@@ -46,10 +46,8 @@ public class SilabusService {
             MataPelajaran mataPelajaran = updatedSilabus.getMataPelajaran();
             if (mataPelajaran != null && mataPelajaran.getId() != 0) {
                 mataPelajaran = mataPelajaranRepository.findById(mataPelajaran.getId()).orElse(mataPelajaran);
-                silabus.setMataPelajaran(mataPelajaran);
-            } else {
-                silabus.setMataPelajaran(mataPelajaran);
             }
+            silabus.setMataPelajaran(mataPelajaran);
 
             return silabusRepository.save(silabus);
         } else {
@@ -57,7 +55,7 @@ public class SilabusService {
         }
     }
 
-    public void deleteSilabus(int id) {
+    public void hapusSilabus(int id) {
         silabusRepository.deleteById(id);
     }
 

@@ -21,9 +21,9 @@ public class SilabusController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createSilabus(@RequestBody Silabus silabus) {
+    public ResponseEntity<?> simpanSilabus(@RequestBody Silabus silabus) {
         try {
-            Silabus createdSilabus = silabusService.createSilabus(silabus);
+            Silabus createdSilabus = silabusService.simpanSilabus(silabus);
             return ResponseEntity.ok(createdSilabus);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create silabus: " + e.getMessage());
@@ -31,9 +31,9 @@ public class SilabusController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateSilabus(@PathVariable int id, @RequestBody Silabus updatedSilabus) {
+    public ResponseEntity<?> ubahSilabus(@PathVariable int id, @RequestBody Silabus updatedSilabus) {
         try {
-            Silabus updated = silabusService.updateSilabus(id, updatedSilabus);
+            Silabus updated = silabusService.ubahSilabus(id, updatedSilabus);
             if (updated != null) {
                 return ResponseEntity.ok(updated);
             } else {
@@ -45,9 +45,9 @@ public class SilabusController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteSilabus(@PathVariable int id) {
+    public ResponseEntity<?> hapusSilabus(@PathVariable int id) {
         try {
-            silabusService.deleteSilabus(id);
+            silabusService.hapusSilabus(id);
             return ResponseEntity.ok("Silabus with id " + id + " deleted successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete silabus: " + e.getMessage());
@@ -69,7 +69,7 @@ public class SilabusController {
     }
 
     @GetMapping("/findAll")
-    public ResponseEntity<?> findAllSilabus() {
+    public ResponseEntity<?> lihatSilabus() {
         try {
             List<Silabus> silabuses = silabusService.findAllSilabus();
             return ResponseEntity.ok(silabuses);

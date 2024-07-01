@@ -16,7 +16,7 @@ public class MataPelajaranService {
     @Autowired
     private MataPelajaranRepository mataPelajaranRepository;
     
-    public List<MataPelajaran> getAllMataPelajaran() {
+    public List<MataPelajaran> lihatMataPelajaran() {
         return mataPelajaranRepository.findAll();
     }
     
@@ -24,13 +24,15 @@ public class MataPelajaranService {
         return mataPelajaranRepository.findById(id);
     }
     
-    public MataPelajaran saveMataPelajaran(MataPelajaran mataPelajaran) {
+    public MataPelajaran simpanMataPelajaran(MataPelajaran mataPelajaran) {
         return mataPelajaranRepository.save(mataPelajaran);
     }
     
-    public void deleteMataPelajaran(int id) {
-        mataPelajaranRepository.deleteById(id);
+    public MataPelajaran ubahMataPelajaran(MataPelajaran mataPelajaran) {
+        return mataPelajaranRepository.save(mataPelajaran);
     }
     
-    // Metode tambahan lain sesuai kebutuhan
+    public void hapusMataPelajaran(int id) {
+        mataPelajaranRepository.deleteById(id);
+    }
 }

@@ -21,11 +21,17 @@ public class JadwalPelajaranService {
     @Autowired
     private MataPelajaranRepository mataPelajaranRepository;
 
-    public JadwalPelajaran saveJadwalPelajaran(JadwalPelajaran jadwalPelajaran) {
+    public JadwalPelajaran simpanJadwalPelajaran(JadwalPelajaran jadwalPelajaran) {
+        List<MataPelajaran> mataPelajaranList = jadwalPelajaran.getMataPelajaran();
+        for (MataPelajaran mataPelajaran : mataPelajaranList) {
+            if (!mataPelajaranRepository.existsById(mataPelajaran.getId())) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mata Pelajaran with id " + mataPelajaran.getId() + " not found");
+            }
+        }
         return jadwalPelajaranRepository.save(jadwalPelajaran);
     }
 
-    public List<JadwalPelajaran> getAllJadwalPelajaran() {
+    public List<JadwalPelajaran> lihatJadwalPelajaran() {
         return jadwalPelajaranRepository.findAll();
     }
 
@@ -34,7 +40,7 @@ public class JadwalPelajaranService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Jadwal Pelajaran not found"));
     }
 
-    public JadwalPelajaran updateJadwalPelajaran(JadwalPelajaran jadwalPelajaran) {
+    public JadwalPelajaran ubahJadwalPelajaran(JadwalPelajaran jadwalPelajaran) {
         JadwalPelajaran existingJadwal = jadwalPelajaranRepository.findById(jadwalPelajaran.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Jadwal Pelajaran not found"));
 
@@ -50,7 +56,7 @@ public class JadwalPelajaranService {
         return jadwalPelajaranRepository.save(existingJadwal);
     }
 
-    public String deleteJadwalPelajaran(int id) {
+    public String hapusJadwalPelajaran(int id) {
         JadwalPelajaran jadwalPelajaran = jadwalPelajaranRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Jadwal Pelajaran not found"));
         jadwalPelajaranRepository.delete(jadwalPelajaran);
