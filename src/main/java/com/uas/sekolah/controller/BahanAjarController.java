@@ -21,7 +21,7 @@ public class BahanAjarController {
     private BahanAjarService bahanAjarService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> simpanBahanAjar(
+    public ResponseEntity<String> simpanAjar(
             @RequestParam("judul") String judul,
             @RequestParam("deskripsi") String deskripsi,
             @RequestParam("tipe") String tipe,
@@ -40,27 +40,27 @@ public class BahanAjarController {
                 bahanAjar.setFile(file.getBytes()); // Save file contents or its metadata
             }
 
-            return bahanAjarService.simpanBahanAjar(bahanAjar, file);
+            return bahanAjarService.simpanAjar(bahanAjar, file);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating Bahan Ajar: " + e.getMessage());
         }
     }
 
     @GetMapping("/all")
-    public List<BahanAjar> lihatBahanAjar() {
-        return bahanAjarService.lihatBahanAjar();
+    public List<BahanAjar> lihatAjar() {
+        return bahanAjarService.lihatAjar();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BahanAjar> getBahanAjarById(@PathVariable("id") int id) {
-        BahanAjar bahanAjar = bahanAjarService.getBahanAjarById(id);
+    public ResponseEntity<BahanAjar> getAjarById(@PathVariable("id") int id) {
+        BahanAjar bahanAjar = bahanAjarService.getAjarById(id);
         return ResponseEntity.ok().body(bahanAjar);
     }
 
     @GetMapping("/file/{id}")
     public ResponseEntity<byte[]> getFile(@PathVariable("id") int id) {
         try {
-            BahanAjar bahanAjar = bahanAjarService.getBahanAjarById(id);
+            BahanAjar bahanAjar = bahanAjarService.getAjarById(id);
             if (bahanAjar == null || bahanAjar.getFile() == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
@@ -96,7 +96,7 @@ public class BahanAjarController {
                 updatedBahanAjar.setFile(file.getBytes()); // Update file contents or its metadata
             }
 
-            return bahanAjarService.ubahBahanAjar(id, updatedBahanAjar, file);
+            return bahanAjarService.ubahAjar(id, updatedBahanAjar, file);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating Bahan Ajar: " + e.getMessage());
         }
@@ -105,7 +105,7 @@ public class BahanAjarController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> hapusBahanAjar(@PathVariable("id") int id) {
         try {
-            return bahanAjarService.hapusBahanAjar(id);
+            return bahanAjarService.hapusAjar(id);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting Bahan Ajar: " + e.getMessage());
         }

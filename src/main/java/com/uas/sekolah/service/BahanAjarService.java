@@ -25,7 +25,7 @@ public class BahanAjarService {
     private MataPelajaranRepository mataPelajaranRepository;
 
     @Transactional
-    public ResponseEntity<String> simpanBahanAjar(BahanAjar bahanAjar, MultipartFile file) {
+    public ResponseEntity<String> simpanAjar(BahanAjar bahanAjar, MultipartFile file) {
         try {
             validateAndSetMataPelajaran(bahanAjar);
 
@@ -46,17 +46,17 @@ public class BahanAjarService {
         }
     }
 
-    public List<BahanAjar> lihatBahanAjar() {
+    public List<BahanAjar> lihatAjar() {
         return bahanAjarRepository.findAll();
     }
 
-    public BahanAjar getBahanAjarById(int id) {
+    public BahanAjar getAjarById(int id) {
         return bahanAjarRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bahan Ajar not found"));
     }
 
     @Transactional
-    public ResponseEntity<String> ubahBahanAjar(int id, BahanAjar updatedBahanAjar, MultipartFile file) {
+    public ResponseEntity<String> ubahAjar(int id, BahanAjar updatedBahanAjar, MultipartFile file) {
         try {
             BahanAjar existingBahanAjar = bahanAjarRepository.findById(id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bahan Ajar not found"));
@@ -85,7 +85,7 @@ public class BahanAjarService {
     }
 
     @Transactional
-    public ResponseEntity<String> hapusBahanAjar(int id) {
+    public ResponseEntity<String> hapusAjar(int id) {
         try {
             BahanAjar bahanAjar = bahanAjarRepository.findById(id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bahan Ajar not found"));

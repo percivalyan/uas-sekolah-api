@@ -19,34 +19,34 @@ public class MataPelajaranController {
     private MataPelajaranService mataPelajaranService;
 
     @GetMapping
-    public ResponseEntity<List<MataPelajaran>> lihatMataPelajaran() {
-        List<MataPelajaran> mataPelajaranList = mataPelajaranService.lihatMataPelajaran();
+    public ResponseEntity<List<MataPelajaran>> lihatMapel() {
+        List<MataPelajaran> mataPelajaranList = mataPelajaranService.lihatMapel();
         return new ResponseEntity<>(mataPelajaranList, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MataPelajaran> getMataPelajaranById(@PathVariable("id") int id) {
-        return mataPelajaranService.getMataPelajaranById(id)
+    public ResponseEntity<MataPelajaran> getMapelById(@PathVariable("id") int id) {
+        return mataPelajaranService.getMapelById(id)
                 .map(mataPelajaran -> new ResponseEntity<>(mataPelajaran, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
     public ResponseEntity<MataPelajaran> simpanMataPelajaran(@RequestBody MataPelajaran mataPelajaran) {
-        MataPelajaran savedMataPelajaran = mataPelajaranService.simpanMataPelajaran(mataPelajaran);
+        MataPelajaran savedMataPelajaran = mataPelajaranService.simpanMapel(mataPelajaran);
         return new ResponseEntity<>(savedMataPelajaran, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<MataPelajaran> ubahMataPelajaran(@PathVariable("id") int id, @RequestBody MataPelajaran mataPelajaran) {
         mataPelajaran.setId(id);
-        MataPelajaran updatedMataPelajaran = mataPelajaranService.ubahMataPelajaran(mataPelajaran);
+        MataPelajaran updatedMataPelajaran = mataPelajaranService.ubahMapel(mataPelajaran);
         return new ResponseEntity<>(updatedMataPelajaran, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> hapusMataPelajaran(@PathVariable("id") int id) {
-        mataPelajaranService.hapusMataPelajaran(id);
+        mataPelajaranService.hapusMapel(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
