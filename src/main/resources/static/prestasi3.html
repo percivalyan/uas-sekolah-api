@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prestasi Akademik</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Prestasi Akademik</h1>
+        
+        <h2 class="mb-4">Tambah Prestasi Akademik</h2>
+        <form id="form-tambah">
+            <div class="form-group">
+                <label for="idSiswa">ID Siswa:</label>
+                <input type="number" class="form-control" id="idSiswa" name="idSiswa" required>
+            </div>
+            <div class="form-group">
+                <label for="idMapel">Mata Pelajaran:</label>
+                <select class="form-control" id="idMapel" name="idMapel" required></select>
+            </div>
+            <div class="form-group">
+                <label for="date">Tanggal:</label>
+                <input type="date" class="form-control" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="jenisPrestasi">Jenis Prestasi:</label>
+                <input type="text" class="form-control" id="jenisPrestasi" name="jenisPrestasi" required>
+            </div>
+            <div class="form-group">
+                <label for="deskripsiAtauNilai">Deskripsi atau Nilai:</label>
+                <input type="text" class="form-control" id="deskripsiAtauNilai" name="deskripsiAtauNilai" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Tambah Prestasi Akademik</button>
+        </form>
+
+        <h2 class="mt-5 mb-4 hidden" id="edit-title">Edit Prestasi Akademik</h2>
+        <form id="form-edit" class="hidden">
+            <input type="hidden" id="editId" name="editId">
+            <div class="form-group">
+                <label for="editIdSiswa">ID Siswa:</label>
+                <input type="number" class="form-control" id="editIdSiswa" name="idSiswa" required>
+            </div>
+            <div class="form-group">
+                <label for="editIdMapel">Mata Pelajaran:</label>
+                <select class="form-control" id="editIdMapel" name="idMapel" required></select>
+            </div>
+            <div class="form-group">
+                <label for="editDate">Tanggal:</label>
+                <input type="date" class="form-control" id="editDate" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="editJenisPrestasi">Jenis Prestasi:</label>
+                <input type="text" class="form-control" id="editJenisPrestasi" name="jenisPrestasi" required>
+            </div>
+            <div class="form-group">
+                <label for="editDeskripsiAtauNilai">Deskripsi atau Nilai:</label>
+                <input type="text" class="form-control" id="editDeskripsiAtauNilai" name="deskripsiAtauNilai" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Prestasi Akademik</button>
+        </form>
+
+        <h2 class="mt-5 mb-4">Daftar Prestasi Akademik</h2>
+        <table class="table table-bordered" id="tabel-prestasi">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>ID Siswa</th>
+                    <th>Mata Pelajaran</th>
+                    <th>Tanggal</th>
+                    <th>Jenis Prestasi</th>
+                    <th>Deskripsi atau Nilai</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data akan dimuat di sini -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const apiUrl = "http://localhost:8080/api/prestasi-akademik";
+
+            function loadPrestasiAkademik() {
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        const tabelPrestasi = document.getElementById("tabel-prestasi").getElementsByTagName("tbody")[0];
+                        tabelPrestasi.innerHTML = "";
+                        data.forEach(prestasi => {
+                            const row = tabelPrestasi.insertRow();
+                            row.insertCell(0).textContent = prestasi.id;
+                            row.insertCell(1).textContent = prestasi.idSiswa;
+                            row.insertCell(2).textContent = `${prestasi.mataPelajaran.kodeMapel} - ${prestasi.mataPelajaran.namaMapel}`;
+                            row.insertCell(3).textContent = prestasi.date;
+                            row.insertCell(4).textContent = prestasi.jenisPrestasi;
+                            row.insertCell(5).textContent = prestasi.deskripsiAtauNilai;
+                            const aksiCell = row.insertCell(6);
+                            const editButton = document.createElement("button");
+                            editButton.className = "btn btn-warning btn-sm mr-2";
+                            editButton.textContent = "Edit";
+                            editButton.onclick = () => editPrestasi(prestasi);
+                            aksiCell.appendChild(editButton);
+                            const deleteButton = document.createElement("button");
+                            deleteButton.className = "btn btn-danger btn-sm";
+                            deleteButton.textContent = "Delete";
+                            deleteButton.onclick = () => deletePrestasi(prestasi.id);
+                            aksiCell.appendChild(deleteButton);
+                        });
+                    })
+                    .catch(error => console.error("Error fetching data:", error));
+            }
+
+            loadPrestasiAkademik();
+
+            async function fetchMataPelajaran() {
+                const response = await fetch('http://localhost:8080/api/mata-pelajaran');
+                const data = await response.json();
+                return data;
+            }
+
+            async function renderMataPelajaranOptions(selectId) {
+                const mataPelajaranList = await fetchMataPelajaran();
+                const select = document.getElementById(selectId);
+                select.innerHTML = '';
+                mataPelajaranList.forEach(mataPelajaran => {
+                    const option = document.createElement('option');
+                    option.value = mataPelajaran.id;
+                    option.textContent = `${mataPelajaran.kodeMapel} - ${mataPelajaran.namaMapel}`;
+                    select.appendChild(option);
+                });
+            }
+
+            renderMataPelajaranOptions('idMapel');
+            renderMataPelajaranOptions('editIdMapel');
+
+            function addPrestasi(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const data = {
+                    idSiswa: formData.get("idSiswa"),
+                    mataPelajaran: { id: formData.get("idMapel") },
+                    date: formData.get("date"),
+                    jenisPrestasi: formData.get("jenisPrestasi"),
+                    deskripsiAtauNilai: formData.get("deskripsiAtauNilai")
+                };
+
+                fetch(apiUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.text())
+                .then(result => {
+                    alert(result);
+                    loadPrestasiAkademik();
+                })
+                .catch(error => console.error("Error:", error));
+            }
+
+            function editPrestasi(prestasi) {
+                document.getElementById("form-tambah").classList.add("hidden");
+                document.getElementById("edit-title").classList.remove("hidden");
+                document.getElementById("form-edit").classList.remove("hidden");
+                const form = document.getElementById("form-edit");
+                form.editId.value = prestasi.id;
+                form.editIdSiswa.value = prestasi.idSiswa;
+                form.editIdMapel.value = prestasi.mataPelajaran.id;
+                form.editDate.value = prestasi.date;
+                form.editJenisPrestasi.value = prestasi.jenisPrestasi;
+                form.editDeskripsiAtauNilai.value = prestasi.deskripsiAtauNilai;
+
+                form.onsubmit = function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(form);
+                    const data = {
+                        idSiswa: formData.get("idSiswa"),
+                        mataPelajaran: { id: formData.get("idMapel") },
+                        date: formData.get("date"),
+                        jenisPrestasi: formData.get("jenisPrestasi"),
+                        deskripsiAtauNilai: formData.get("deskripsiAtauNilai")
+                    };
+
+                    fetch(`${apiUrl}/${form.editId.value}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result);
+                        loadPrestasiAkademik();
+                        form.reset();
+                        document.getElementById("form-edit").classList.add("hidden");
+                        document.getElementById("edit-title").classList.add("hidden");
+                        document.getElementById("form-tambah").classList.remove("hidden");
+                    })
+                    .catch(error => console.error("Error:", error));
+                }
+            }
+
+            function deletePrestasi(id) {
+                if (confirm("Apakah Anda yakin ingin menghapus prestasi akademik ini?")) {
+                    fetch(`${apiUrl}/${id}`, {
+                        method: "DELETE"
+                    })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result);
+                        loadPrestasiAkademik();
+                    })
+                    .catch(error => console.error("Error:", error));
+                }
+            }
+
+            document.getElementById("form-tambah").addEventListener("submit", addPrestasi);
+        });
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

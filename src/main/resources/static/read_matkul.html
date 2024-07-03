@@ -26,18 +26,20 @@
 
     <h2>Tambah Mata Pelajaran Baru</h2>
 
-    <form id="formTambahMapel">
-        <label for="kodeMapel">Kode Mata Pelajaran:</label><br>
-        <input type="text" id="kodeMapel" name="kodeMapel" required><br><br>
+    <h2 id="judulFormTambah">Tambah Mata Pelajaran Baru</h2>
+<form id="formTambahMapel">
+    <label for="kodeMapel">Kode Mata Pelajaran:</label><br>
+    <input type="text" id="kodeMapel" name="kodeMapel" required><br><br>
 
-        <label for="namaMapel">Nama Mata Pelajaran:</label><br>
-        <input type="text" id="namaMapel" name="namaMapel" required><br><br>
+    <label for="namaMapel">Nama Mata Pelajaran:</label><br>
+    <input type="text" id="namaMapel" name="namaMapel" required><br><br>
 
-        <label for="tingkat">Tingkat:</label><br>
-        <input type="text" id="tingkat" name="tingkat" required><br><br>
+    <label for="tingkat">Tingkat:</label><br>
+    <input type="text" id="tingkat" name="tingkat" required><br><br>
 
-        <button type="submit">Simpan</button>
-    </form>
+    <button type="submit">Simpan</button>
+</form>
+
 
     <h2>Daftar Mata Pelajaran</h2>
 
@@ -104,24 +106,33 @@
         }
 
         async function fillFormEdit(id) {
-            const mataPelajaran = await getMataPelajaranById(id);
+    const mataPelajaran = await getMataPelajaranById(id);
 
-            document.getElementById('idMapel').value = mataPelajaran.id;
-            document.getElementById('editKodeMapel').value = mataPelajaran.kodeMapel;
-            document.getElementById('editNamaMapel').value = mataPelajaran.namaMapel;
-            document.getElementById('editTingkat').value = mataPelajaran.tingkat;
+    document.getElementById('idMapel').value = mataPelajaran.id;
+    document.getElementById('editKodeMapel').value = mataPelajaran.kodeMapel;
+    document.getElementById('editNamaMapel').value = mataPelajaran.namaMapel;
+    document.getElementById('editTingkat').value = mataPelajaran.tingkat;
 
-            // Tampilkan form edit dan sembunyikan tabel
-            document.getElementById('formEditMapel').style.display = 'block';
-            document.getElementById('tabelMataPelajaran').style.display = 'none';
-        }
+    // Sematkan judul untuk form edit dan sembunyikan form tambah
+    document.getElementById('judulFormTambah').style.display = 'none';
+    document.getElementById('formTambahMapel').style.display = 'none';
 
-        async function cancelEdit() {
-            // Reset form edit dan tampilkan kembali tabel
-            document.getElementById('formEditMapel').reset();
-            document.getElementById('formEditMapel').style.display = 'none';
-            document.getElementById('tabelMataPelajaran').style.display = 'block';
-        }
+    // Tampilkan form edit
+    document.getElementById('formEditMapel').style.display = 'block';
+    document.getElementById('tabelMataPelajaran').style.display = 'none';
+}
+
+async function cancelEdit() {
+    // Reset form edit dan tampilkan kembali tabel
+    document.getElementById('formEditMapel').reset();
+    document.getElementById('formEditMapel').style.display = 'none';
+    document.getElementById('tabelMataPelajaran').style.display = 'block';
+
+    // Tampilkan kembali form tambah
+    document.getElementById('judulFormTambah').style.display = 'block';
+    document.getElementById('formTambahMapel').style.display = 'block';
+}
+
 
         async function editMataPelajaran(event) {
             event.preventDefault();

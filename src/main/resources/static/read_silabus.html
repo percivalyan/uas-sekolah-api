@@ -23,35 +23,34 @@
 </head>
 <body>
     <h1>Manajemen Silabus Mata Pelajaran</h1>
-
-    <h2>Tambah Silabus Baru</h2>
-
+    <h2 id="judulFormTambah">Tambah Silabus Baru</h2>
     <form id="formTambahSilabus">
         <label for="mataPelajaran">Mata Pelajaran:</label><br>
         <select id="mataPelajaran" name="mataPelajaran" required>
             <!-- Options will be filled dynamically from API -->
         </select><br><br>
-
+    
         <label for="judul">Judul:</label><br>
         <input type="text" id="judul" name="judul" required><br><br>
-
+    
         <label for="deskripsi">Deskripsi:</label><br>
         <textarea id="deskripsi" name="deskripsi" rows="4" required></textarea><br><br>
-
+    
         <label for="tujuan">Tujuan:</label><br>
         <textarea id="tujuan" name="tujuan" rows="4" required></textarea><br><br>
-
+    
         <label for="materi">Materi:</label><br>
         <textarea id="materi" name="materi" rows="4" required></textarea><br><br>
-
+    
         <label for="metode">Metode:</label><br>
         <textarea id="metode" name="metode" rows="4" required></textarea><br><br>
-
+    
         <label for="evaluasi">Evaluasi:</label><br>
         <textarea id="evaluasi" name="evaluasi" rows="4" required></textarea><br><br>
-
+    
         <button type="submit">Simpan</button>
     </form>
+    
 
     <h2>Daftar Silabus</h2>
 
@@ -161,27 +160,34 @@
         }
 
         async function fillFormEdit(id) {
-            const response = await fetch(`http://localhost:8080/api/silabus/find/${id}`);
-            const silabus = await response.json();
+    const response = await fetch(`http://localhost:8080/api/silabus/find/${id}`);
+    const silabus = await response.json();
 
-            document.getElementById('idSilabus').value = silabus.id;
-            document.getElementById('editMataPelajaran').value = silabus.mataPelajaran.id;
-            document.getElementById('editJudul').value = silabus.judul;
-            document.getElementById('editDeskripsi').value = silabus.deskripsi;
-            document.getElementById('editTujuan').value = silabus.tujuan;
-            document.getElementById('editMateri').value = silabus.materi;
-            document.getElementById('editMetode').value = silabus.metode;
-            document.getElementById('editEvaluasi').value = silabus.evaluasi;
+    document.getElementById('idSilabus').value = silabus.id;
+    document.getElementById('editMataPelajaran').value = silabus.mataPelajaran.id;
+    document.getElementById('editJudul').value = silabus.judul;
+    document.getElementById('editDeskripsi').value = silabus.deskripsi;
+    document.getElementById('editTujuan').value = silabus.tujuan;
+    document.getElementById('editMateri').value = silabus.materi;
+    document.getElementById('editMetode').value = silabus.metode;
+    document.getElementById('editEvaluasi').value = silabus.evaluasi;
 
-            document.getElementById('formEditSilabus').style.display = 'block';
-            document.getElementById('tabelSilabus').style.display = 'none';
-        }
+    document.getElementById('judulFormTambah').style.display = 'none';
+    document.getElementById('formTambahSilabus').style.display = 'none';
 
-        async function cancelEdit() {
-            document.getElementById('formEditSilabus').reset();
-            document.getElementById('formEditSilabus').style.display = 'none';
-            document.getElementById('tabelSilabus').style.display = 'block';
-        }
+    document.getElementById('formEditSilabus').style.display = 'block';
+    document.getElementById('tabelSilabus').style.display = 'none';
+}
+
+async function cancelEdit() {
+    document.getElementById('formEditSilabus').reset();
+    document.getElementById('formEditSilabus').style.display = 'none';
+    document.getElementById('tabelSilabus').style.display = 'block';
+
+    document.getElementById('judulFormTambah').style.display = 'block';
+    document.getElementById('formTambahSilabus').style.display = 'block';
+}
+
 
         async function editSilabus(event) {
             event.preventDefault();
