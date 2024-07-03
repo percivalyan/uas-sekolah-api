@@ -6,17 +6,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
-// import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import lombok.Data;
-
-import java.sql.Blob;
 
 @Entity
 @Table(name = "bahan_ajar")
 @Data
 public class BahanAjar {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -25,17 +24,22 @@ public class BahanAjar {
     @JoinColumn(name = "id_mapel")
     private MataPelajaran mataPelajaran;
 
-    @Column(name = "judul")
+    @Column(name = "judul", nullable = false)
     private String judul;
 
-    @Column(name = "deskripsi")
+    @Column(name = "deskripsi", nullable = false)
     private String deskripsi;
 
-    @Column(name = "tipe")
+    @Column(name = "tipe", nullable = false)
     private String tipe;
 
-    @Column(name = "file")
-    private Blob file;
+    @Lob // Use @Lob for large objects like byte[]
+    @Column(name = "file", columnDefinition = "LONGBLOB")
+    private byte[] file;
 
-    // Add getters and setters as needed
+    @Column(name = "file_type")
+    private String fileType;
+
+    // Constructors, getters, and setters
+    // Omitted for brevity
 }

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Tambah Bahan Ajar</title>
+</head>
+<body>
+    <h2>Form Tambah Bahan Ajar</h2>
+
+    <form id="formTambahBahanAjar" enctype="multipart/form-data">
+        <label for="idMapel">Pilih Mata Pelajaran:</label><br>
+        <select id="idMapel" name="idMapel" required>
+            <!-- Options akan dimasukkan secara dinamis oleh JavaScript -->
+        </select><br><br>
+
+        <label for="judul">Judul Bahan Ajar:</label><br>
+        <input type="text" id="judul" name="judul" required><br><br>
+
+        <label for="deskripsi">Deskripsi Bahan Ajar:</label><br>
+        <textarea id="deskripsi" name="deskripsi" rows="4" required></textarea><br><br>
+
+        <label for="tipe">Tipe Bahan Ajar:</label><br>
+        <input type="text" id="tipe" name="tipe" required><br><br>
+
+        <label for="file">File Bahan Ajar:</label><br>
+        <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" required><br><br>
+
+        <button type="submit">Simpan</button>
+    </form>
+
+    <script>
+        async function fetchMataPelajaran() {
+            try {
+                const response = await fetch('http://localhost:8080/api/mata-pelajaran');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                alert('Failed to fetch Mata Pelajaran data');
+                return [];
+            }
+        }
+
+        async function renderMataPelajaranOptions() {
+            const mataPelajaranList = await fetchMataPelajaran();
+            const select = document.getElementById('idMapel');
+
+            select.innerHTML = ''; // Bersihkan opsi sebelumnya
+
+            mataPelajaranList.forEach(mataPelajaran => {
+                const option = document.createElement('option');
+                option.value = mataPelajaran.id;
+                option.textContent = `${mataPelajaran.kodeMapel} - ${mataPelajaran.namaMapel}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Panggil fungsi untuk memuat opsi mata pelajaran saat halaman dimuat
+        renderMataPelajaranOptions();
+
+        // Event listener untuk form tambah bahan ajar
+        document.getElementById('formTambahBahanAjar').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const idMapel = document.getElementById('idMapel').value;
+            const judul = document.getElementById('judul').value;
+            const deskripsi = document.getElementById('deskripsi').value;
+            const tipe = document.getElementById('tipe').value;
+            const file = document.getElementById('file').files[0];
+
+            const formData = new FormData();
+            formData.append('idMapel', idMapel);
+            formData.append('judul', judul);
+            formData.append('deskripsi', deskripsi);
+            formData.append('tipe', tipe);
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('http://localhost:8080/api/bahan-ajar/create', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Bahan ajar berhasil disimpan!');
+                    document.getElementById('formTambahBahanAjar').reset(); // Kosongkan form setelah pengiriman berhasil
+                } else {
+                    alert('Gagal menyimpan bahan ajar.');
+                }
+            } catch (error) {
+                console.error('Error saving Bahan Ajar:', error);
+                alert('Failed to save Bahan Ajar');
+            }
+        });
+    </script>
+</body>
+</html>
