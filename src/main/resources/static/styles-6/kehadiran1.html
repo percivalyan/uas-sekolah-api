@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kehadiran Siswa</title>
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Daftar Kehadiran Siswa</h1>
+
+    <div id="kehadiran-list">
+        <!-- Daftar kehadiran akan dimuat di sini -->
+    </div>
+
+    <script>
+        // Fungsi untuk memuat data kehadiran dari API
+        function loadKehadiran() {
+            $.ajax({
+                url: 'http://localhost:8080/api/kehadiran', // Sesuaikan dengan URL API Anda
+                type: 'GET',
+                success: function(data) {
+                    $('#kehadiran-list').empty(); // Kosongkan daftar sebelum memuat data baru
+                    data.forEach(function(kehadiran) {
+                        $('#kehadiran-list').append(
+                            `<div>
+                                <h3>ID: ${kehadiran.id}</h3>
+                                <p>Tanggal: ${kehadiran.tanggal}</p>
+                                <p>Status: ${kehadiran.status}</p>
+                                <p>Keterangan: ${kehadiran.keterangan ? kehadiran.keterangan : '-'}</p>
+                                <p>Siswa: ${kehadiran.siswa.nama}</p>
+                            </div>`
+                        );
+                    });
+                },
+                error: function() {
+                    alert('Gagal memuat data kehadiran.');
+                }
+            });
+        }
+
+        // Memanggil fungsi loadKehadiran saat halaman dimuat
+        $(document).ready(function() {
+            loadKehadiran();
+        });
+    </script>
+</body>
+</html>

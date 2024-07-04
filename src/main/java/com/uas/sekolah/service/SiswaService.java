@@ -68,4 +68,6 @@ public class SiswaService {
     public List<Siswa> findAllSiswa() {
         return siswaRepository.findAll();
     }
+
+    
 }

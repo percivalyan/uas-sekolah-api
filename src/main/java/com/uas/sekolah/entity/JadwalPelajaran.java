@@ -36,6 +36,14 @@ public class JadwalPelajaran {
     )
     private List<MataPelajaran> mataPelajaran;
 
+    // @ManyToMany
+    // @JoinTable(
+    //     name = "jadwal_pelajaran_siswa",
+    //     joinColumns = @JoinColumn(name = "id_siswa"),
+    //     inverseJoinColumns = @JoinColumn(name = "id_mapel")
+    // )
+    // private List<Siswa> siswa;
+
     @Column(name = "id_guru")
     private int idGuru;
 

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Tahun Ajaran</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manajemen Tahun Ajaran</h1>
+
+    <!-- Form untuk menambah Tahun Ajaran -->
+    <h2>Input Tahun Ajaran Baru</h2>
+    <form id="formTambahTA">
+        <label for="tahun">Tahun:</label><br>
+        <input type="text" id="tahun" name="tahun" required><br><br>
+
+        <label for="periode">Periode:</label><br>
+        <input type="number" id="periode" name="periode" required><br><br>
+
+        <label for="tglMulai">Tanggal Mulai:</label><br>
+        <input type="date" id="tglMulai" name="tglMulai" required><br><br>
+
+        <label for="tglAkhir">Tanggal Akhir:</label><br>
+        <input type="date" id="tglAkhir" name="tglAkhir" required><br><br>
+
+        <label for="kurikulum">Kurikulum:</label><br>
+        <input type="text" id="kurikulum" name="kurikulum" required><br><br>
+
+        <button type="submit">Simpan</button>
+        <button type="button" id="ubahButton" style="display: none;">Ubah</button>
+    </form>
+
+    <!-- Tabel untuk menampilkan data Tahun Ajaran -->
+    <h2>Daftar Tahun Ajaran</h2>
+    <table id="tahunAjaranTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tahun</th>
+                <th>Periode</th>
+                <th>Tanggal Mulai</th>
+                <th>Tanggal Akhir</th>
+                <th>Kurikulum</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="tahunAjaranList">
+            <!-- Data Tahun Ajaran akan dimasukkan di sini -->
+        </tbody>
+    </table>
+
+    <script>
+        // Mengambil data Tahun Ajaran dari API dan menampilkan dalam tabel
+        function fetchDataAndRenderTable() {
+            fetch('http://localhost:8080/api/tahun-ajaran')
+                .then(response => response.json())
+                .then(data => {
+                    const tahunAjaranListElement = document.getElementById('tahunAjaranList');
+
+                    // Mengosongkan tabel sebelum memasukkan data baru
+                    tahunAjaranListElement.innerHTML = '';
+
+                    // Memasukkan setiap Tahun Ajaran ke dalam tabel
+                    data.forEach(tahunAjaran => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${tahunAjaran.id}</td>
+                            <td>${tahunAjaran.tahun}</td>
+                            <td>${tahunAjaran.periode}</td>
+                            <td>${new Date(tahunAjaran.tglMulai).toLocaleDateString()}</td>
+                            <td>${new Date(tahunAjaran.tglAkhir).toLocaleDateString()}</td>
+                            <td>${tahunAjaran.kurikulum}</td>
+                            <td>
+                                <button onclick="hapusTA(${tahunAjaran.id})">Hapus</button>
+                                <button onclick="tampilkanFormUbah(${tahunAjaran.id})">Ubah</button>
+                            </td>
+                        `;
+                        tahunAjaranListElement.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Memanggil fungsi untuk mengambil data dan menampilkan tabel saat halaman dimuat
+        fetchDataAndRenderTable();
+
+        // Event listener untuk form tambah Tahun Ajaran
+        document.getElementById('formTambahTA').addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah pengiriman form secara default
+
+            const tahunAjaranData = {
+                tahun: document.getElementById('tahun').value,
+                periode: parseInt(document.getElementById('periode').value),
+                tglMulai: document.getElementById('tglMulai').value,
+                tglAkhir: document.getElementById('tglAkhir').value,
+                kurikulum: document.getElementById('kurikulum').value
+            };
+
+            fetch('http://localhost:8080/api/tahun-ajaran', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(tahunAjaranData),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Gagal menyimpan Tahun Ajaran.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Tahun Ajaran berhasil disimpan!');
+                // Mengosongkan form setelah disimpan
+                document.getElementById('formTambahTA').reset();
+                // Memanggil kembali fungsi untuk memperbarui tabel setelah menambahkan data baru
+                fetchDataAndRenderTable();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menyimpan Tahun Ajaran.');
+            });
+        });
+
+        // Fungsi untuk menghapus Tahun Ajaran
+        function hapusTA(id) {
+            if (confirm('Anda yakin ingin menghapus Tahun Ajaran ini?')) {
+                fetch(`http://localhost:8080/api/tahun-ajaran/${id}`, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Gagal menghapus Tahun Ajaran.');
+                    }
+                    alert('Tahun Ajaran berhasil dihapus!');
+                    // Memanggil kembali fungsi untuk memperbarui tabel setelah menghapus data
+                    fetchDataAndRenderTable();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat menghapus Tahun Ajaran.');
+                });
+            }
+        }
+
+        // Fungsi untuk menampilkan form ubah Tahun Ajaran
+        function tampilkanFormUbah(id) {
+        fetch(`http://localhost:8080/api/tahun-ajaran/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                // Populate form fields with existing data
+                document.getElementById('tahun').value = data.tahun;
+                document.getElementById('periode').value = data.periode;
+                document.getElementById('tglMulai').value = data.tglMulai;
+                document.getElementById('tglAkhir').value = data.tglAkhir;
+                document.getElementById('kurikulum').value = data.kurikulum;
+
+                // Show the update button
+                const ubahButton = document.getElementById('ubahButton');
+                ubahButton.style.display = 'inline';
+
+                // Update event listener for the update button
+                ubahButton.onclick = function() {
+                    const tahunAjaranUpdate = {
+                        tahun: document.getElementById('tahun').value,
+                        periode: parseInt(document.getElementById('periode').value),
+                        tglMulai: document.getElementById('tglMulai').value,
+                        tglAkhir: document.getElementById('tglAkhir').value,
+                        kurikulum: document.getElementById('kurikulum').value
+                    };
+
+                    fetch(`http://localhost:8080/api/tahun-ajaran/${id}`, {
+                        method: 'POST', // Use POST method for update
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(tahunAjaranUpdate),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Gagal mengubah Tahun Ajaran.');
+                        }
+                        alert('Tahun Ajaran berhasil diubah!');
+                        // Hide the update button after successful update
+                        ubahButton.style.display = 'none';
+                        // Clear the form fields after update
+                        document.getElementById('formTambahTA').reset();
+                        // Refresh the table with updated data
+                        fetchDataAndRenderTable();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengubah Tahun Ajaran.');
+                    });
+                };
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                alert('Terjadi kesalahan saat mengambil data Tahun Ajaran.');
+            });
+    }
+    </script>
+</body>
+</html>

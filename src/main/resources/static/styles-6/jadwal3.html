@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Pelajaran</title>
+</head>
+<body>
+    <h1>Tambah Jadwal Pelajaran</h1>
+    <form id="form-tambah">
+        <label for="guru">ID Guru:</label>
+        <input type="number" id="guru" name="guru" required><br>
+
+        <label for="kelas">ID Kelas:</label>
+        <input type="number" id="kelas" name="kelas" required><br>
+
+        <label for="hari">Hari:</label>
+        <select id="hari" name="hari" required>
+            <option value="SENIN">Senin</option>
+            <option value="SELASA">Selasa</option>
+            <option value="RABU">Rabu</option>
+            <option value="KAMIS">Kamis</option>
+            <option value="JUMAT">Jumat</option>
+            <option value="SABTU">Sabtu</option>
+        </select><br>
+
+        <label for="jamMulai">Jam Mulai:</label>
+        <input type="number" id="jamMulai" name="jamMulai" required><br>
+
+        <label for="jamSelesai">Jam Selesai:</label>
+        <input type="number" id="jamSelesai" name="jamSelesai" required><br>
+
+        <label for="mataPelajaran">Mata Pelajaran:</label>
+        <select id="mataPelajaran" name="mataPelajaran" required></select><br>
+
+        <button type="submit">Tambah Jadwal</button>
+    </form>
+
+    <h1>Daftar Jadwal Pelajaran</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Guru</th>
+                <th>Kelas</th>
+                <th>Hari</th>
+                <th>Jam Mulai</th>
+                <th>Jam Selesai</th>
+                <th>Mata Pelajaran</th>
+            </tr>
+        </thead>
+        <tbody id="jadwal-table-body">
+        </tbody>
+    </table>
+
+    <script>
+        const apiUrl = 'http://localhost:8080/api/jadwal-pelajaran';
+
+        async function fetchMataPelajaran() {
+            const response = await fetch('http://localhost:8080/api/mata-pelajaran');
+            const data = await response.json();
+            return data;
+        }
+
+        async function loadJadwal() {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            const tableBody = document.getElementById("jadwal-table-body");
+            tableBody.innerHTML = "";
+            data.forEach(jadwal => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${jadwal.id}</td>
+                    <td>${jadwal.idGuru}</td>
+                    <td>${jadwal.idKelas}</td>
+                    <td>${jadwal.hari}</td>
+                    <td>${jadwal.jamMulai}</td>
+                    <td>${jadwal.jamSelesai}</td>
+                    <td>${jadwal.mataPelajaran.map(mp => mp.namaMapel).join(", ")}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const mataPelajaranSelect = document.getElementById('mataPelajaran');
+            const mataPelajaranData = await fetchMataPelajaran();
+
+            mataPelajaranData.forEach(mataPelajaran => {
+                const option = document.createElement('option');
+                option.value = mataPelajaran.id;
+                option.text = mataPelajaran.namaMapel;
+                mataPelajaranSelect.appendChild(option);
+            });
+
+            loadJadwal();
+        });
+
+        document.getElementById("form-tambah").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = {
+                mataPelajaran: [{ id: formData.get("mataPelajaran") }],
+                idGuru: formData.get("guru"),
+                idKelas: formData.get("kelas"),
+                hari: formData.get("hari"),
+                jamMulai: formData.get("jamMulai"),
+                jamSelesai: formData.get("jamSelesai")
+            };
+
+            fetch(apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById("form-tambah").reset();
+                loadJadwal();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

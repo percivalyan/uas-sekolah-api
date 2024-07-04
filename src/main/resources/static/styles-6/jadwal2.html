@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Jadwal Pelajaran</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Manajemen Jadwal Pelajaran</h1>
+
+        <h2 class="mb-4">Tambah Jadwal Pelajaran</h2>
+        <form id="form-tambah">
+            <div class="form-group">
+                <label for="mataPelajaran">Mata Pelajaran:</label>
+                <select class="form-control" id="mataPelajaran" name="mataPelajaran" required></select>
+            </div>
+            <div class="form-group">
+                <label for="guru">Guru:</label>
+                <input type="text" class="form-control" id="guru" name="guru" required>
+            </div>
+            <div class="form-group">
+                <label for="kelas">Kelas:</label>
+                <input type="text" class="form-control" id="kelas" name="kelas" required>
+            </div>
+            <div class="form-group">
+                <label for="hari">Hari:</label>
+                <select class="form-control" id="hari" name="hari" required>
+                    <option value="SENIN">Senin</option>
+                    <option value="SELASA">Selasa</option>
+                    <option value="RABU">Rabu</option>
+                    <option value="KAMIS">Kamis</option>
+                    <option value="JUMAT">Jumat</option>
+                    <option value="SABTU">Sabtu</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="jamMulai">Jam Mulai:</label>
+                <input type="number" class="form-control" id="jamMulai" name="jamMulai" required>
+            </div>
+            <div class="form-group">
+                <label for="jamSelesai">Jam Selesai:</label>
+                <input type="number" class="form-control" id="jamSelesai" name="jamSelesai" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Tambah Jadwal</button>
+        </form>
+
+        <h2 class="mt-5 mb-4">Edit Jadwal Pelajaran</h2>
+        <form id="form-edit" style="display: none;">
+            <input type="hidden" id="edit-id" name="id">
+            <div class="form-group">
+                <label for="edit-mataPelajaran">Mata Pelajaran:</label>
+                <select class="form-control" id="edit-mataPelajaran" name="mataPelajaran" required></select>
+            </div>
+            <div class="form-group">
+                <label for="edit-guru">Guru:</label>
+                <input type="text" class="form-control" id="edit-guru" name="guru" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-kelas">Kelas:</label>
+                <input type="text" class="form-control" id="edit-kelas" name="kelas" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-hari">Hari:</label>
+                <select class="form-control" id="edit-hari" name="hari" required>
+                    <option value="SENIN">Senin</option>
+                    <option value="SELASA">Selasa</option>
+                    <option value="RABU">Rabu</option>
+                    <option value="KAMIS">Kamis</option>
+                    <option value="JUMAT">Jumat</option>
+                    <option value="SABTU">Sabtu</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edit-jamMulai">Jam Mulai:</label>
+                <input type="number" class="form-control" id="edit-jamMulai" name="jamMulai" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-jamSelesai">Jam Selesai:</label>
+                <input type="number" class="form-control" id="edit-jamSelesai" name="jamSelesai" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+            <button type="button" class="btn btn-secondary ml-2" onclick="cancelEdit()">Batal</button>
+        </form>
+
+        <h2 class="mt-5 mb-4">Daftar Jadwal Pelajaran</h2>
+        <table class="table table-bordered" id="tabel-jadwal">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Mata Pelajaran</th>
+                    <th>Guru</th>
+                    <th>Kelas</th>
+                    <th>Hari</th>
+                    <th>Jam Mulai</th>
+                    <th>Jam Selesai</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data akan dimuat di sini -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const apiUrl = "http://localhost:8080/api/jadwal-pelajaran";
+
+            // Function to fetch jadwal data and render table
+            function loadJadwal() {
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        const tabelJadwal = document.getElementById("tabel-jadwal").getElementsByTagName("tbody")[0];
+                        tabelJadwal.innerHTML = "";
+                        data.forEach(jadwal => {
+                            const row = tabelJadwal.insertRow();
+                            row.insertCell(0).textContent = jadwal.id;
+                            row.insertCell(1).textContent = jadwal.mataPelajaran.map(mp => mp.namaMapel).join(', ');
+                            row.insertCell(2).textContent = jadwal.idGuru;
+                            row.insertCell(3).textContent = jadwal.idKelas;
+                            row.insertCell(4).textContent = jadwal.hari;
+                            row.insertCell(5).textContent = jadwal.jamMulai + ' WIB';
+                            row.insertCell(6).textContent = jadwal.jamSelesai + ' WIB';
+
+                            const editButton = document.createElement("button");
+                            editButton.className = "btn btn-primary btn-sm mr-2";
+                            editButton.textContent = "Edit";
+                            editButton.onclick = () => editJadwal(jadwal.id);
+                            row.insertCell(7).appendChild(editButton);
+
+                            const deleteButton = document.createElement("button");
+                            deleteButton.className = "btn btn-danger btn-sm";
+                            deleteButton.textContent = "Delete";
+                            deleteButton.onclick = () => deleteJadwal(jadwal.id);
+                            row.insertCell(7).appendChild(deleteButton);
+                        });
+                    })
+                    .catch(error => console.error("Error fetching data:", error));
+            }
+
+            // Load mata pelajaran options in select dropdown
+            async function renderMataPelajaranOptions(selectId) {
+                const mataPelajaranList = await fetchMataPelajaran();
+                const select = document.getElementById(selectId);
+                select.innerHTML = '';
+                mataPelajaranList.forEach(mp => {
+                    const option = document.createElement('option');
+                    option.value = mp.id;
+                    option.textContent = mp.namaMapel;
+                    select.appendChild(option);
+                });
+            }
+
+            // Fetch mata pelajaran data
+            async function fetchMataPelajaran() {
+                const response = await fetch('http://localhost:8080/api/mata-pelajaran');
+                const data = await response.json();
+                return data;
+            }
+
+            // Function to handle form submission for adding jadwal
+            document.getElementById("form-tambah").addEventListener("submit", function(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const data = {
+                    mataPelajaran: [{ id: formData.get("mataPelajaran") }],
+                    idGuru: formData.get("guru"),
+                    idKelas: formData.get("kelas"),
+                    hari: formData.get("hari"),
+                    jamMulai: formData.get("jamMulai"),
+                    jamSelesai: formData.get("jamSelesai")
+                };
+
+                fetch(apiUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById("form-tambah").reset();
+                    loadJadwal();
+                })
+                .catch(error => {
+                    console.error('Error adding jadwal:', error);
+                });
+            });
+
+            // Function to handle form submission for editing jadwal
+            document.getElementById("form-edit").addEventListener("submit", function(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const id = formData.get("id");
+                const data = {
+                    mataPelajaran: [{ id: formData.get("mataPelajaran") }],
+                    idGuru: formData.get("guru"),
+                    idKelas: formData.get("kelas"),
+                    hari: formData.get("hari"),
+                    jamMulai: formData.get("jamMulai"),
+                    jamSelesai: formData.get("jamSelesai")
+                };
+
+                fetch(`${apiUrl}/${id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    cancelEdit();
+                    loadJadwal();
+                })
+                .catch(error => {
+                    console.error('Error editing jadwal:', error);
+                });
+            });
+
+
+
+            
+            // Function to populate form fields for editing jadwal
+            function editJadwal(id) {
+                fetch(`${apiUrl}/${id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("edit-id").value = data.id;
+                        document.getElementById("edit-guru").value = data.idGuru;
+                        document.getElementById("edit-kelas").value = data.idKelas;
+                        document.getElementById("edit-hari").value = data.hari;
+                        document.getElementById("edit-jamMulai").value = data.jamMulai;
+                        document.getElementById("edit-jamSelesai").value = data.jamSelesai;
+
+                        // Load mata pelajaran options in edit form
+                        renderMataPelajaranOptions("edit-mataPelajaran")
+                            .then(() => {
+                                document.getElementById("edit-mataPelajaran").value = data.mataPelajaran[0].id;
+                            });
+
+                        // Hide tambah form, show edit form
+                        document.getElementById("form-tambah").style.display = "none";
+                        document.getElementById("form-edit").style.display = "block";
+                    })
+                    .catch(error => console.error('Error fetching jadwal for edit:', error));
+            }
+
+            // Function to cancel edit and reset form
+            function cancelEdit() {
+                document.getElementById("form-edit").reset();
+                document.getElementById("form-edit").style.display = "none";
+                document.getElementById("form-tambah").style.display = "block";
+            }
+
+            // Function to delete jadwal
+            function deleteJadwal(id) {
+                if (confirm("Apakah Anda yakin ingin menghapus jadwal ini?")) {
+                    fetch(`${apiUrl}/${id}`, {
+                        method: "DELETE"
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        loadJadwal();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting jadwal:', error);
+                    });
+                }
+            }
+
+            // Load mata pelajaran options initially
+            renderMataPelajaranOptions("mataPelajaran");
+            renderMataPelajaranOptions("edit-mataPelajaran");
+
+            // Load jadwal data initially
+            loadJadwal();
+        });
+    </script>
+</body>
+</html>

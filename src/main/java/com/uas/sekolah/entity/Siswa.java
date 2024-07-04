@@ -9,6 +9,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Data;
 
 import java.util.Date;
@@ -31,6 +33,7 @@ public class Siswa {
     @Column(name = "nama_lengkap", nullable = false)
     private String nama_lengkap;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "tanggal_lahir", nullable = false)
     private Date tanggal_lahir;
 
@@ -43,12 +46,9 @@ public class Siswa {
     @Column(name = "telp", nullable = false)
     private String telp;
 
-    @Column(name = "foto_name")
-    private String fotoName; // Menyimpan nama file gambar
-
     @Lob
     @Column(name = "foto")
-    private byte[] foto; // Menyimpan data gambar dalam bentuk byte array
+    private byte[] foto;
 
     @Column(name = "status", nullable = false)
     private boolean status;
